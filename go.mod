@@ -4,6 +4,7 @@ go 1.21.7
 
 require (
 	cloud.google.com/go/storage v1.40.0
+	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.12.0
 	google.golang.org/api v0.176.1
 )
