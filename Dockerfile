@@ -12,7 +12,6 @@ FROM alpine:3.19 AS build-release-stage
 
 WORKDIR /
 
-COPY --from=build-stage /app/.env /.env
 COPY --from=build-stage /goapp /goapp
 
 EXPOSE 8080

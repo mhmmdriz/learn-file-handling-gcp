@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"cloud.google.com/go/storage"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"google.golang.org/api/option"
@@ -66,9 +65,9 @@ func uploadFilesToGCS(c echo.Context) error {
 
 func main() {
 	// Load environment variables from .env file
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+	// if err := godotenv.Load(); err != nil {
+	// 	log.Fatalf("Error loading .env file: %v", err)
+	// }
 
 	e := echo.New()
 
