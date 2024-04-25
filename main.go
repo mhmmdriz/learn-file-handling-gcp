@@ -19,6 +19,8 @@ const (
 	bucketName = "learn_file_handling_go"
 )
 
+var credentials = os.Getenv("GCP_CREDENTIALS")
+
 func uploadFilesToGCS(c echo.Context) error {
 	// Parse form data, including files
 	if err := c.Request().ParseMultipartForm(10 << 20); err != nil {
@@ -37,7 +39,6 @@ func uploadFilesToGCS(c echo.Context) error {
 
 		// Load GCP credentials securely (consider using KMS or secrets manager)
 		ctx := context.Background()
-		credentials := os.Getenv("GCP_CREDENTIALS")
 		client, err := storage.NewClient(ctx, option.WithCredentialsJSON([]byte(credentials)))
 		if err != nil {
 			log.Printf("Error creating GCS client: %v", err)
@@ -63,6 +64,37 @@ func uploadFilesToGCS(c echo.Context) error {
 	return c.String(http.StatusOK, "Semua file berhasil diunggah ke folder /images di GCS\n")
 }
 
+func deleteFilesFromGCS(c echo.Context) error {
+	// Parse request body to get file names to be deleted
+	var fileNames []string
+	if err := c.Bind(&fileNames); err != nil {
+		return err
+	}
+
+	// Create GCS client
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx, option.WithCredentialsJSON([]byte(credentials)))
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	// Delete files from GCS
+	for _, fileName := range fileNames {
+		// Construct object handle
+		obj := client.Bucket(bucketName).Object(fileName)
+
+		// Delete object
+		if err := obj.Delete(ctx); err != nil {
+			return err
+		}
+
+		fmt.Printf("File %s berhasil dihapus dari GCS\n", fileName)
+	}
+
+	return c.String(http.StatusOK, "Semua file berhasil dihapus dari GCS\n")
+}
+
 func main() {
 	// Load environment variables from .env file
 	// if err := godotenv.Load(); err != nil {
@@ -76,6 +108,7 @@ func main() {
 
 	e.Static("/", "public")
 	e.POST("/gcp-upload", uploadFilesToGCS)
+	e.DELETE("/gcp-delete", deleteFilesFromGCS)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
