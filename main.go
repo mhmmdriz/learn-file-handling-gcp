@@ -111,4 +111,5 @@ func main() {
 	e.DELETE("/gcp-delete", deleteFilesFromGCS)
 
 	e.Logger.Fatal(e.Start(":8080"))
+	// Test Update
 }
